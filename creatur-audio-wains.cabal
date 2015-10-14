@@ -1,0 +1,72 @@
+name:                creatur-audio-wains
+version:             1.1.0
+synopsis:            Simple audio library for use with creatur-wains.
+description:         Simple audio library for use with creatur-wains.
+                     Audio can be genetically encoded and decoded,
+                     making them suitable to represent the appearance
+                     of a wain.
+homepage:            https://github.com/mhwombat/creatur-audio-wains
+license:             BSD3
+license-file:        LICENSE
+author:              Amy de Buitléir
+maintainer:          amy@nualeargais.ie
+copyright:           (c) Amy de Buitléir 2012-2015
+category:            Data
+build-type:          Simple
+extra-source-files:  ChangeLog.md
+cabal-version:       >=1.10
+
+library
+  exposed-modules:     ALife.Creatur.Wain.Audio.ExamineAgent,
+                       ALife.Creatur.Wain.Audio.Pattern,
+                       ALife.Creatur.Wain.Audio.PatternDB,
+                       ALife.Creatur.Wain.Audio.Tweaker,
+                       ALife.Creatur.Wain.Audio.Wain,
+                       ALife.Creatur.Wain.Audio.Util,
+                       ALife.Creatur.Wain.Audio.Object
+  ghc-options:         -Wall -fno-warn-orphans
+  build-depends:       base >=4.8 && <4.9,
+                       base64-bytestring ==1.0.*,
+                       bytestring ==0.10.*,
+                       cereal ==0.4.*,
+                       containers ==0.5.*,
+                       creatur ==5.9.*,
+                       creatur-wains ==7.*,
+                       directory ==1.2.*,
+                       filepath ==1.4.*,
+                       JuicyPixels ==3.2.*,
+                       lens ==4.12.*,
+                       MonadRandom ==0.4.*,
+                       mtl ==2.2.*,
+                       random ==1.1.*,
+                       som ==8.2.*,
+                       split ==0.2.*,
+                       transformers ==0.4.*,
+                       unix == 2.7.*,
+                       utf8-string ==1.*,
+                       vector ==0.10.*
+  hs-source-dirs:      src
+  default-language:    Haskell2010
+
+Test-suite wain-tests
+  type:                exitcode-stdio-1.0
+  main-is:             Main.hs
+  ghc-options:         -Wall -fno-warn-orphans
+  hs-source-dirs:      test, src
+  build-depends:       base >=4.8 && <4.9,
+                       base64-bytestring ==1.0.*,
+                       bytestring ==0.10.*,
+                       cereal ==0.4.*,
+                       creatur ==5.9.*,
+                       creatur-wains ==7.*,
+                       creatur-wains-test-utils ==0.1.*,
+                       JuicyPixels ==3.2.*,
+                       MonadRandom ==0.4.*,
+                       QuickCheck ==2.8.*,
+                       som ==8.2.*,
+                       split ==0.2.*,
+                       test-framework ==0.8.*,
+                       test-framework-hunit ==0.3.*,
+                       test-framework-quickcheck2 ==0.3.*,
+                       utf8-string ==1.*,
+                       vector ==0.10.*
