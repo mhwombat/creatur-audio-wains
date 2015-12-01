@@ -31,6 +31,7 @@ import Control.Lens
 
 data Object a = IObject Audio String
               | AObject (W.Wain Audio PatternTweaker a)
+              deriving (Eq, Show)
 
 isAudio :: Object a -> Bool
 isAudio (IObject _ _) = True
@@ -41,7 +42,7 @@ objectId (IObject _ s) = "Audio " ++ s
 objectId (AObject a) = agentId a
 
 objectNum :: Object a -> Int
-objectNum (IObject _ s) = read $ take 2 s
+objectNum (IObject _ s) = read . take 1 . drop 1 $ s
 objectNum (AObject _) = 10
 
 objectAppearance :: Object a -> Audio

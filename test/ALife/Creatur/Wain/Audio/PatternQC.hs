@@ -99,7 +99,14 @@ prop_makeAudioSimilar_improves_similarity (TwoPatternsSameLength a b) r
 -- normalised :: Audio -> Bool
 -- normalised (Audio _ xs) = abs(norm xs - 1) < aTad || norm xs == 0
 --   where aTad = 1e-10
-        
+
+prop_selectFrames_returns_correctLength
+  :: [[Double]] -> Positive Int -> Property
+prop_selectFrames_returns_correctLength xs n =
+  (not . null) xs ==> length xs' == n'
+  where n' = getPositive n
+        Right xs' = selectFrames xs n'
+
 equiv :: Audio -> Audio -> Bool
 equiv a b = audioDiff a b <= aTad
   where aTad = 0.00001
@@ -132,6 +139,7 @@ test = testGroup "ALife.Creatur.Wain.Audio.PatternQC"
     testProperty "prop_full_adjustment_gives_perfect_match"
       prop_full_adjustment_gives_perfect_match,
     testProperty "prop_makeAudioSimilar_improves_similarity"
-      prop_makeAudioSimilar_improves_similarity    
-    
+      prop_makeAudioSimilar_improves_similarity,
+    testProperty "prop_selectFrames_returns_correctLength"
+      prop_selectFrames_returns_correctLength    
   ]

@@ -1,5 +1,5 @@
 name:                creatur-audio-wains
-version:             1.1.0
+version:             1.1.2
 synopsis:            Simple audio library for use with creatur-wains.
 description:         Simple audio library for use with creatur-wains.
                      Audio can be genetically encoded and decoded,

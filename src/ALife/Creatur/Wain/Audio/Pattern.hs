@@ -24,7 +24,8 @@ module ALife.Creatur.Wain.Audio.Pattern
     valid,
     invalid,
     norm,
-    toRawData
+    toRawData,
+    selectFrames -- exported for testing
   ) where
 
 import ALife.Creatur.Genetics.BRGCWord8 (Genetic, put, get,
@@ -38,6 +39,8 @@ import ALife.Creatur.Wain.Util (inRange)
 import Control.Monad (replicateM)
 import Control.Monad.Random (Rand, RandomGen, getRandomRs)
 import Data.Datamining.Pattern (adjustVector, euclideanDistanceSquared)
+import Data.List (minimumBy)
+import Data.Ord (comparing)
 import Data.Serialize (Serialize)
 import Data.Word (Word16, Word8)
 import GHC.Generics (Generic)
@@ -106,13 +109,11 @@ randomAudio n
   = fmap (Audio n . take n) (getRandomRs audioValueRange)
 
 readAudio :: FilePath -> Int -> IO Audio
-readAudio filePath maxVectorCount = do
+readAudio filePath desiredVectorCount = do
   raw <- readFile filePath
   -- Each line in the text file contains one vector
   let vectors = map stringToVector $ lines raw
-  -- Some files will have more vectors than others. We will duplicate
-  -- some vectors so that all samples will be the same length.
-  let result = stretch vectors maxVectorCount
+  let result = selectFrames vectors desiredVectorCount
   case result of
     Left msg     -> error $ "Problem with " ++ filePath ++ ": " ++ msg
     Right sample -> return . mkAudio $ concat sample
@@ -129,3 +130,36 @@ invalid = not . valid
 norm :: Floating a => [a] -> a
 norm xs = sqrt $ sum (map f xs)
   where f x = x*x
+
+selectFrames :: [[Double]] -> Int -> Either String [[Double]]
+selectFrames xs n
+  | l < n     = stretch xs n
+  | l > n     = dropSmallestChanges xs (l-n)
+  | otherwise = Right xs
+  where l = length xs
+
+dropSmallestChanges :: [[Double]] -> Int -> Either String [[Double]]
+dropSmallestChanges (x:xs) n = Right (x:xs')
+  where xs' = map snd . dropSmallestChanges' n $ dxs
+        dxs = diffs (x:xs)
+dropSmallestChanges [] _ = Left "zero-length vector"
+
+dropSmallestChanges' :: Int -> [(Double, [Double])] -> [(Double, [Double])]
+dropSmallestChanges' 0 xs = xs
+dropSmallestChanges' n xs = dropSmallestChanges' (n-1) xs'
+  where x = minimumBy (comparing fst) xs
+        xs' = dropFirstOccurrence x xs
+  
+  
+diffs :: [[Double]] -> [(Double, [Double])]
+diffs (v1:v2:vs) = (euclideanDistanceSquared v1 v2, v2) : diffs (v2:vs)
+diffs [_] = []
+diffs [] = []
+
+dropFirstOccurrence :: Eq a => a -> [a] -> [a]
+dropFirstOccurrence x (y:ys)
+  = if y == x then ys else y : dropFirstOccurrence x ys
+dropFirstOccurrence _ [] = []
+
+-- wombat [[0.1,0.2,0.3],[0.1,0.2,0.3],[0.2,0.4,0.6],[0.4,0.6,0.8],[0.2,0.4,0.6],[0.1,0.2,0.3],[0.1,0.2,0.3]]
+-- [(0.0,[0.1,0.2,0.3]),(0.14,[0.2,0.4,0.6]),(0.12000000000000002,[0.4,0.6,0.8]),(0.12000000000000002,[0.2,0.4,0.6]),(0.14,[0.1,0.2,0.3]),(0.0,[0.1,0.2,0.3])]

@@ -74,11 +74,11 @@ examine a = do
   putStrLn $ "predictor SQ: " ++ show (schemaQuality . view predictor . view brain $ a)
   putStrLn $ "DSQ: " ++ show (decisionQuality . view brain $ a)
   putStrLn $ "Number of classifier models: " ++ show (numModels . view classifier . view brain $ a)
-  putStrLn $ "Classifier learning function " ++ show (view exponentialParams . view classifier . view brain $ a)
+  putStrLn $ "Classifier learning function " ++ show (view learningParams . view classifier . view brain $ a)
   putStrLn $ "Classifier counts: " ++ show (counterMap . view classifier . view brain $ a)
   mapM_ putStrLn $ describeClassifierModels a
   putStrLn $ "Number of predictor models: " ++ show (numModels . view predictor . view brain $ a)
-  putStrLn $ "Predictor learning function " ++ show (view exponentialParams . view predictor . view brain $ a)
+  putStrLn $ "Predictor learning function " ++ show (view learningParams . view predictor . view brain $ a)
   putStrLn $ "Predictor counts: " ++ show (counterMap . view predictor . view brain $ a)
   mapM_ putStrLn $ describePredictorModels a
   -- putStrLn "--------"
