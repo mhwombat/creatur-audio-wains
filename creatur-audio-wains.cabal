@@ -44,7 +44,7 @@ library
                        transformers ==0.5.*,
                        unix == 2.7.*,
                        utf8-string ==1.*,
-                       vector ==0.10.*
+                       vector ==0.11.*
   hs-source-dirs:      src
   default-language:    Haskell2010
 
@@ -69,4 +69,4 @@ Test-suite wain-tests
                        test-framework-hunit ==0.3.*,
                        test-framework-quickcheck2 ==0.3.*,
                        utf8-string ==1.*,
-                       vector ==0.10.*
+                       vector ==0.11.*
