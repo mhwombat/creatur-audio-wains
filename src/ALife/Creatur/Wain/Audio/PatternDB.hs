@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------
 -- |
 -- Module      :  ALife.Creatur.Wain.Audio.PatternDB
--- Copyright   :  (c) Amy de Buitléir 2012-2015
+-- Copyright   :  (c) Amy de Buitléir 2012-2016
 -- License     :  BSD-style
 -- Maintainer  :  amy@nualeargais.ie
 -- Stability   :  experimental
@@ -18,7 +18,7 @@ module ALife.Creatur.Wain.Audio.PatternDB
     anyPattern
   ) where
 
-import ALife.Creatur.Wain.Audio.Pattern (Audio, readAudio)
+import ALife.Creatur.Wain.Audio.Pattern (Pattern, readAudio)
 import Control.Monad (unless)
 import Control.Monad.IO.Class (liftIO)
 import Control.Monad.State (StateT, get, gets, put)
@@ -63,7 +63,7 @@ isPatternFileName :: String -> Bool
 isPatternFileName s =
   s `notElem` [ "archive", ".", ".." ]
 
-anyPattern :: StateT PatternDB IO (Audio, String)
+anyPattern :: StateT PatternDB IO (Pattern, String)
 anyPattern = do
   initIfNeeded
   db <- get

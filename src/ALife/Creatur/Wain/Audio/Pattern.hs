@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------
 -- |
 -- Module      :  ALife.Creatur.Wain.Audio.Pattern
--- Copyright   :  (c) Amy de Buitléir 2012-2015
+-- Copyright   :  (c) Amy de Buitléir 2012-2016
 -- License     :  BSD-style
 -- Maintainer  :  amy@nualeargais.ie
 -- Stability   :  experimental
@@ -14,7 +14,7 @@
 {-# LANGUAGE TypeFamilies #-}
 module ALife.Creatur.Wain.Audio.Pattern
   (
-    Audio(..),
+    Pattern,
     mkAudio,
     audioDiff,
     makeAudioSimilar,
@@ -50,9 +50,9 @@ import GHC.Generics (Generic)
 audioValueRange :: (Double,Double)
 audioValueRange = (-100,100)
 
-maxAudioValueDiffSquared :: Double
-maxAudioValueDiffSquared = (b-a)*(b-a)
-  where (b,a) = audioValueRange
+maxAudioValueDiff :: Double
+maxAudioValueDiff = b - a
+  where (a,b) = audioValueRange
 
 audioValueToWord8 :: Double -> Word8
 audioValueToWord8 x = round x + 100
@@ -60,19 +60,19 @@ audioValueToWord8 x = round x + 100
 word8ToAudioValue :: Word8 -> Double
 word8ToAudioValue g = (fromIntegral g) - 100
 
-data Audio = Audio Int [Double]
+data Pattern = Audio Int [Double]
   deriving (Eq, Show, Generic)
 
-mkAudio :: [Double] -> Audio
+mkAudio :: [Double] -> Pattern
 mkAudio xs = Audio (length xs) xs
 
-toRawData :: Audio -> [Double]
+toRawData :: Pattern -> [Double]
 toRawData (Audio _ xs) = xs
 
-instance Serialize Audio
-instance Diploid Audio
+instance Serialize Pattern
+instance Diploid Pattern
 
-instance Genetic Audio where
+instance Genetic Pattern where
   put (Audio n xs) =
     put (fromIntegral n :: Word16) >>
     -- mapM_ put (map audioValueToWord8 xs)
@@ -87,15 +87,16 @@ instance Genetic Audio where
         let ys = sequence xs :: Either [String] [Word8]
         return $ fmap (mkAudio . map word8ToAudioValue) ys
 
-audioDiff :: Audio -> Audio -> UIDouble
+audioDiff :: Pattern -> Pattern -> UIDouble
 audioDiff (Audio n xs) (Audio m ys)
     | n /= m     = error "length mismatch between audio patterns"
     | n == 0    = 0
-    | otherwise = doubleToUI $ (euclideanDistanceSquared xs ys)/z
-    where z = fromIntegral n * maxAudioValueDiffSquared
+    | otherwise = doubleToUI $ (sum $ zipWith absDiff xs ys)/z
+    where absDiff x y = abs $ x - y
+          z = fromIntegral n * maxAudioValueDiff
     -- scaled so that the difference is betwen 0 and 1.
 
-makeAudioSimilar :: Audio -> UIDouble -> Audio -> Audio
+makeAudioSimilar :: Pattern -> UIDouble -> Pattern -> Pattern
 makeAudioSimilar (Audio n xs) r (Audio m ys) =
     if n == m
       then mkAudio $ adjustVector xs (uiToDouble r) ys
@@ -104,11 +105,11 @@ makeAudioSimilar (Audio n xs) r (Audio m ys) =
 -- Used for generating the initial brain models in the initial
 -- population.
 -- | Generates an audio vector of the specified length.
-randomAudio :: RandomGen r => Int -> Rand r Audio
+randomAudio :: RandomGen r => Int -> Rand r Pattern
 randomAudio n
   = fmap (Audio n . take n) (getRandomRs audioValueRange)
 
-readAudio :: FilePath -> Int -> IO Audio
+readAudio :: FilePath -> Int -> IO Pattern
 readAudio filePath desiredVectorCount = do
   raw <- readFile filePath
   -- Each line in the text file contains one vector
@@ -121,10 +122,10 @@ readAudio filePath desiredVectorCount = do
 stringToVector :: String -> [Double]
 stringToVector s = map read $ words s
 
-valid :: Audio -> Bool
+valid :: Pattern -> Bool
 valid (Audio _ xs) = all (inRange audioValueRange) xs
 
-invalid :: Audio -> Bool
+invalid :: Pattern -> Bool
 invalid = not . valid
 
 norm :: Floating a => [a] -> a

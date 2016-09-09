@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------
 -- |
 -- Module      :  ALife.Creatur.Wain.Audio.PatternQC
--- Copyright   :  (c) Amy de Buitléir 2013-2015
+-- Copyright   :  (c) Amy de Buitléir 2013-2016
 -- License     :  BSD-style
 -- Maintainer  :  amy@nualeargais.ie
 -- Stability   :  experimental
@@ -27,42 +27,42 @@ import Test.QuickCheck
 instance Arbitrary UIDouble where
   arbitrary = doubleToUI <$> choose unitInterval
 
-sizedArbAudio :: Int -> Gen Audio
+sizedArbAudio :: Int -> Gen Pattern
 sizedArbAudio n = do
   ps <- vectorOf n (choose audioValueRange)
   return . mkAudio $ map abs ps
 
-instance Arbitrary Audio where
+instance Arbitrary Pattern where
   arbitrary = sized sizedArbAudio
 
-prop_audioDiff_can_be_0 :: Audio -> Property
+prop_audioDiff_can_be_0 :: Pattern -> Property
 prop_audioDiff_can_be_0 img = property $ audioDiff img img == 0
 
-prop_audioDiff_btw_0_and_1 :: Audio -> Audio -> Property
+prop_audioDiff_btw_0_and_1 :: Pattern -> Pattern -> Property
 prop_audioDiff_btw_0_and_1 i1 i2 = property $ 0 <= x && x <= 1
   where x = audioDiff i1 i2
 
-prop_audioDiff_symmetric :: Audio -> Audio -> Property
+prop_audioDiff_symmetric :: Pattern -> Pattern -> Property
 prop_audioDiff_symmetric i1 i2 = property $
   audioDiff i1 i2 == audioDiff i2 i1
 
--- prop_audio_patterns_are_normalised :: Audio -> Property
+-- prop_audio_patterns_are_normalised :: Pattern -> Property
 -- prop_audio_patterns_are_normalised p = property $ normalised p
 
-prop_audio_patterns_are_initially_valid :: Audio -> Property
+prop_audio_patterns_are_initially_valid :: Pattern -> Property
 prop_audio_patterns_are_initially_valid p = property $ valid p
 
 -- prop_makeAudioSimilar_result_is_normalised
---   :: Audio -> UIDouble -> Audio -> Property
+--   :: Pattern -> UIDouble -> Pattern -> Property
 -- prop_makeAudioSimilar_result_is_normalised a r b
 --   = property . normalised $ makeAudioSimilar a r b
 
 prop_makeAudioSimilar_result_is_valid
-  :: Audio -> UIDouble -> Audio -> Property
+  :: Pattern -> UIDouble -> Pattern -> Property
 prop_makeAudioSimilar_result_is_valid a r b
   = property . valid $ makeAudioSimilar a r b
 
-data TwoPatternsSameLength = TwoPatternsSameLength Audio Audio 
+data TwoPatternsSameLength = TwoPatternsSameLength Pattern Pattern 
   deriving Show
 
 sizedTwoPatternsSameLength :: Int -> Gen TwoPatternsSameLength
@@ -94,9 +94,9 @@ prop_makeAudioSimilar_improves_similarity (TwoPatternsSameLength a b) r
       where d1 = audioDiff a b
             d2 = audioDiff a b'
             b' = makeAudioSimilar a r b
-            (Audio _ as) = a
+            as = toRawData a
 
--- normalised :: Audio -> Bool
+-- normalised :: Pattern -> Bool
 -- normalised (Audio _ xs) = abs(norm xs - 1) < aTad || norm xs == 0
 --   where aTad = 1e-10
 
@@ -107,19 +107,19 @@ prop_selectFrames_returns_correctLength xs n =
   where n' = getPositive n
         Right xs' = selectFrames xs n'
 
-equiv :: Audio -> Audio -> Bool
+equiv :: Pattern -> Pattern -> Bool
 equiv a b = audioDiff a b <= aTad
-  where aTad = 0.00001
+  where aTad = 0.01
 
 test :: Test
 test = testGroup "ALife.Creatur.Wain.Audio.PatternQC"
   [
-    testProperty "prop_serialize_round_trippable - Audio"
-      (prop_serialize_round_trippable :: Audio -> Property),
-    testProperty "prop_genetic_round_trippable - Audio"
-      (prop_genetic_round_trippable equiv :: Audio -> Property),
-    testProperty "prop_diploid_identity - Audio"
-      (prop_diploid_identity (==) :: Audio -> Property),
+    testProperty "prop_serialize_round_trippable - Pattern"
+      (prop_serialize_round_trippable :: Pattern -> Property),
+    testProperty "prop_genetic_round_trippable - Pattern"
+      (prop_genetic_round_trippable equiv :: Pattern -> Property),
+    testProperty "prop_diploid_identity - Pattern"
+      (prop_diploid_identity (==) :: Pattern -> Property),
     testProperty "prop_audioDiff_can_be_0"
       prop_audioDiff_can_be_0,
     testProperty "prop_audioDiff_btw_0_and_1"

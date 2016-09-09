@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------
 -- |
 -- Module      :  ALife.Creatur.Wain.Audio.Wain
--- Copyright   :  (c) Amy de Buitléir 2013-2015
+-- Copyright   :  (c) Amy de Buitléir 2013-2016
 -- License     :  BSD-style
 -- Maintainer  :  amy@nualeargais.ie
 -- Stability   :  experimental
@@ -13,7 +13,7 @@
 {-# LANGUAGE Rank2Types #-}
 module ALife.Creatur.Wain.Audio.Wain
   (
-    AudioWain,
+    PatternWain,
     describeClassifierModels,
     describePredictorModels,
     adjustEnergy,
@@ -26,7 +26,7 @@ import qualified ALife.Creatur.Wain as W
 import ALife.Creatur.Wain.Brain (classifier, predictor)
 import ALife.Creatur.Wain.GeneticSOM (modelMap, numModels)
 import ALife.Creatur.Wain.Pretty (pretty)
-import ALife.Creatur.Wain.Audio.Pattern (Audio)
+import ALife.Creatur.Wain.Audio.Pattern (Pattern)
 import ALife.Creatur.Wain.Audio.Tweaker (PatternTweaker(..))
 import ALife.Creatur.Wain.UnitInterval (uiToDouble)
 import Control.Lens hiding (universe)
@@ -40,22 +40,22 @@ import Text.Printf (printf)
 -- packageVersion :: String
 -- packageVersion = "creatur-audio-wains-" ++ showVersion version
 
-type AudioWain a = W.Wain Audio PatternTweaker a
+type PatternWain a rt = W.Wain Pattern PatternTweaker rt a
 
-describeClassifierModels :: AudioWain a -> [String]
+describeClassifierModels :: PatternWain a rt -> [String]
 describeClassifierModels w = map f ms
   where ms = M.toList . modelMap . view (W.brain . classifier) $ w
         f (l, r) = agentId w ++ "'s classifier model "
                      ++ show l ++ " " ++ show r
 
-describePredictorModels :: Show a => AudioWain a -> [String]
+describePredictorModels :: Show a => PatternWain a rt -> [String]
 describePredictorModels w = map f ms
   where ms = M.toList . modelMap . view (W.brain . predictor) $ w
         f (l, r) = agentId w ++ "'s predictor model "
                      ++ show l ++ ": " ++ pretty r
 
 adjustEnergy
-  :: Simple Lens e (AudioWain a) -> Double
+  :: Simple Lens e (PatternWain a rt) -> Double
     -> Simple Lens s Double -> String -> Simple Lens e s
       -> (String -> StateT e IO ()) -> StateT e IO ()
 adjustEnergy
@@ -72,6 +72,6 @@ adjustEnergy
   (summary . statLens) += used
   assign wainLens w'
 
-metabCost :: Double -> Double -> Double -> AudioWain a -> Double
+metabCost :: Double -> Double -> Double -> PatternWain a rt -> Double
 metabCost bmc cpcm scale w = scale * (bmc + cpcm * fromIntegral n)
   where n = numModels . view (W.brain . classifier) $ w

@@ -1,5 +1,5 @@
 name:                creatur-audio-wains
-version:             1.2.1
+version:             1.2.2
 synopsis:            Simple audio library for use with creatur-wains.
 description:         Simple audio library for use with creatur-wains.
                      Audio can be genetically encoded and decoded,
@@ -10,7 +10,7 @@ license:             BSD3
 license-file:        LICENSE
 author:              Amy de Buitléir
 maintainer:          amy@nualeargais.ie
-copyright:           (c) Amy de Buitléir 2012-2015
+copyright:           (c) Amy de Buitléir 2012-2016
 category:            Data
 build-type:          Simple
 extra-source-files:  ChangeLog.md
@@ -31,7 +31,7 @@ library
                        cereal ==0.5.*,
                        containers ==0.5.*,
                        creatur ==5.9.*,
-                       creatur-wains ==8.4.*,
+                       creatur-wains ==8.6.*,
                        directory ==1.2.*,
                        filepath ==1.4.*,
                        JuicyPixels ==3.2.*,
@@ -58,7 +58,7 @@ Test-suite wain-tests
                        bytestring ==0.10.*,
                        cereal ==0.5.*,
                        creatur ==5.9.*,
-                       creatur-wains ==8.4.*,
+                       creatur-wains ==8.6.*,
                        creatur-wains-test-utils ==1.*,
                        JuicyPixels ==3.2.*,
                        MonadRandom ==0.4.*,
