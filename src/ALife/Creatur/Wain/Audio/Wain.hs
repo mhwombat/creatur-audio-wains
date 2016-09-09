@@ -17,8 +17,8 @@ module ALife.Creatur.Wain.Audio.Wain
     describeClassifierModels,
     describePredictorModels,
     adjustEnergy,
-    metabCost
-    -- packageVersion
+    metabCost,
+    packageVersion
   ) where
 
 import ALife.Creatur (agentId)
@@ -32,13 +32,13 @@ import ALife.Creatur.Wain.UnitInterval (uiToDouble)
 import Control.Lens hiding (universe)
 import Control.Monad.State.Lazy (StateT)
 import qualified Data.Map.Strict as M
--- import Data.Version (showVersion)
--- import Paths_creatur_audio_wains (version)
+import Data.Version (showVersion)
+import Paths_creatur_audio_wains (version)
 import Text.Printf (printf)
 
--- -- | Returns the current version number of this library.
--- packageVersion :: String
--- packageVersion = "creatur-audio-wains-" ++ showVersion version
+-- | Returns the current version number of this library.
+packageVersion :: String
+packageVersion = "creatur-audio-wains-" ++ showVersion version
 
 type PatternWain a rt = W.Wain Pattern PatternTweaker rt a
 

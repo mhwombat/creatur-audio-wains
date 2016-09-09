@@ -1,5 +1,5 @@
 name:                creatur-audio-wains
-version:             1.2.2
+version:             1.2.3
 synopsis:            Simple audio library for use with creatur-wains.
 description:         Simple audio library for use with creatur-wains.
                      Audio can be genetically encoded and decoded,
@@ -25,6 +25,7 @@ library
                        ALife.Creatur.Wain.Audio.Util,
                        ALife.Creatur.Wain.Audio.Object
   ghc-options:         -Wall -fno-warn-orphans
+  other-modules:       Paths_creatur_audio_wains
   build-depends:       base >=4.8 && <4.9,
                        base64-bytestring ==1.0.*,
                        bytestring ==0.10.*,
